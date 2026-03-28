@@ -76,7 +76,7 @@ if churn_f == 'Active':    df = df[df['churn'] == 0]
 elif churn_f == 'Churned': df = df[df['churn'] == 1]
 st.sidebar.markdown(f'**{len(df):,}** users selected')
 st.sidebar.markdown('---')
-st.sidebar.markdown('**Phase coverage:** 23 / 27 ✅')
+st.sidebar.markdown('**Phase coverage:** 27 / 27 ✅')
 st.sidebar.markdown('**Model AUC:** 0.84 (GBM)')
 
 st.title('📊 Mirae Asset Digital Platform — Analytics Dashboard')

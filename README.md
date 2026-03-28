@@ -56,23 +56,22 @@ from raw data generation through predictive modelling, business simulation, and 
 | 17 | Pricing Strategy — AOV distribution, revenue concentration, optimisation scenarios | NB08 |
 | 18 | Business Simulation — 4 independent + 1 combined scenario | NB08 |
 
-### Stage 5 — Output & Deployment
-| Phase | Description | Notebook / File |
-|-------|-------------|-----------------|
-| 19 | Power BI Dashboard | Planned — export tables available in data/processed/ |
-| 20 | Automation — pipeline.py reads raw CSVs, rebuilds user_data.csv end-to-end | NB09 + scripts/pipeline.py |
-| 21 | Deployment — 4-tab Streamlit dashboard with RFM/cluster segmentation tab | NB09 + app/app.py |
-| 22 | Documentation — README, requirements.txt, .gitignore | NB09 |
-| 23 | Video Walkthrough | Planned — Loom recording (link to be added) |
-
-### Stage 6 — Elite Thinking
+### Stage 5 — Strategic Decision Intelligence 🔥
 | Phase | Description | Notebook |
 |-------|-------------|----------|
-| 24 | KPI Tree — revenue decomposition, sensitivity analysis by lever | NB08 |
-| 25 | Root Cause Analysis — February revenue dip decomposition | NB08 |
-| 26 | Decision Simulation — impact vs effort matrix, ranked action plan | NB08 |
-| 27 | Data Pipeline Architecture — system overview, data flow diagram | NB09 |
+| 19 | KPI Tree — revenue decomposition, sensitivity analysis by lever | NB08 |
+| 20 | Root Cause Analysis — February revenue dip decomposition | NB08 |
+| 21 | Decision Simulation — impact vs effort matrix, ranked action plan | NB08 |
+| 22 | Data Pipeline Architecture — system overview, data flow diagram | NB09 |
 
+### Stage 6 — Production & Deployment 🚀
+| Phase | Description | Notebook / File |
+|-------|-------------|-----------------|
+| 23 | Power BI Dashboard | Planned — export tables available in data/processed/ |
+| 24 | Automation — pipeline.py reads raw CSVs, rebuilds user_data.csv end-to-end | NB09 + scripts/pipeline.py |
+| 25 | Deployment — 4-tab Streamlit dashboard with RFM/cluster segmentation tab | NB09 + app/app.py |
+| 26 | Documentation — README, requirements.txt, .gitignore | NB09 |
+| 27 | Video Walkthrough | Planned — Loom recording (link to be added) |
 ---
 
 ## Key Findings
