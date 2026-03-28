@@ -1,0 +1,31 @@
+# Data files are included in Git (synthetic dataset, safe for public repo)
+# Needed for Streamlit Cloud to serve the dashboard without pipeline run
+# Uncomment below to exclude CSVs and run pipeline.py after cloning instead:
+# data/raw/*.csv
+# data/processed/*.csv
+
+# Jupyter
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/
