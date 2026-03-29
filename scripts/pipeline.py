@@ -13,7 +13,11 @@ def run_pipeline():
     log('Starting pipeline...')
     users    = pd.read_csv(os.path.join(RAW,'users.csv'), parse_dates=['signup_date'])
     sessions = pd.read_csv(os.path.join(RAW,'sessions.csv'), parse_dates=['session_date'])
+    sessions = sessions.merge(users[['user_id','signup_date']], on='user_id', how='left')
+    sessions = sessions[sessions['session_date'] >= sessions['signup_date']].drop(columns='signup_date')
     txns     = pd.read_csv(os.path.join(RAW,'transactions.csv'), parse_dates=['transaction_date'])
+    txns = txns.merge(users[['user_id','signup_date']], on='user_id', how='left')
+    txns = txns[txns['transaction_date'] >= txns['signup_date']].drop(columns='signup_date')
     events   = pd.read_csv(os.path.join(RAW,'events.csv'), parse_dates=['event_date'])
 
     for name, df in [('users',users),('sessions',sessions),('transactions',txns),('events',events)]:
