@@ -26,28 +26,35 @@ def clean_chart(ax):
 
 @st.cache_data
 def load_data():
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    proc = os.path.join(base, 'data', 'processed')
-    df = pd.read_csv(
-        os.path.join(proc, 'user_data.csv'),
-        parse_dates=['signup_date', 'last_active_date', 'first_purchase_date']
-    )
-    df['churn']           = df['churn'].astype(int)
-    df['has_purchased']   = df['has_purchased'].astype(int)
-    df['total_sessions']  = df['total_sessions'].astype(int)
-    df['total_purchases'] = df['total_purchases'].astype(int)
-    df['age_group'] = pd.cut(
-        df['age'], bins=[17, 24, 34, 44, 59],
-        labels=['18-24', '25-34', '35-44', '45-59']
-    )
-    seg_path = os.path.join(proc, 'user_data_segmented.csv')
-    if os.path.exists(seg_path):
-        seg = pd.read_csv(seg_path, usecols=['user_id', 'RFM_Segment', 'cluster_label'])
-        df = df.merge(seg, on='user_id', how='left')
-    else:
-        df['RFM_Segment']   = None
-        df['cluster_label'] = None
-    return df
+    try:
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        proc = os.path.join(base, 'data', 'processed')
+        df = pd.read_csv(
+            os.path.join(proc, 'user_data.csv'),
+            parse_dates=['signup_date', 'last_active_date', 'first_purchase_date']
+        )
+        df['churn']           = df['churn'].astype(int)
+        df['has_purchased']   = df['has_purchased'].astype(int)
+        df['total_sessions']  = df['total_sessions'].astype(int)
+        df['total_purchases'] = df['total_purchases'].astype(int)
+        df['age_group'] = pd.cut(
+            df['age'], bins=[17, 24, 34, 44, 59],
+            labels=['18-24', '25-34', '35-44', '45-59']
+        )
+        seg_path = os.path.join(proc, 'user_data_segmented.csv')
+        if os.path.exists(seg_path):
+            seg = pd.read_csv(seg_path, usecols=['user_id', 'RFM_Segment', 'cluster_label'])
+            df = df.merge(seg, on='user_id', how='left')
+        else:
+            df['RFM_Segment']   = None
+            df['cluster_label'] = None
+        return df
+    except FileNotFoundError as e:
+        st.error(f'Data file not found: {e}. Run pipeline.py first.')
+        st.stop()
+    except Exception as e:
+        st.error(f'Error loading data: {e}')
+        st.stop()
 
 df_full = load_data()
 
@@ -92,20 +99,49 @@ with tab1:
     st.subheader('Key Performance Indicators')
     buyers = df[df['has_purchased'] == 1]
     bf     = df_full[df_full['has_purchased'] == 1]
+
+    filters_active = len(df) < len(df_full)
+
     metrics = [
-        ('Total Users',      len(df),                                         len(df_full),                   ''),
-        ('Total Revenue',    df['total_revenue'].sum(),                        df_full['total_revenue'].sum(), 'Rs'),
-        ('Churn Rate',       df['churn'].mean(),                               df_full['churn'].mean(),        'pct'),
-        ('Conversion Rate',  df['has_purchased'].mean(),                       df_full['has_purchased'].mean(),'pct'),
-        ('Avg LTV (buyers)', buyers['total_revenue'].mean() if len(buyers)>0 else 0, bf['total_revenue'].mean(),'Rs'),
-        ('Avg AOV',          buyers['avg_order_value'].mean() if len(buyers)>0 else 0, bf['avg_order_value'].mean(),'Rs'),
+        ('Total Users',      len(df),                                                  len(df_full),                   '', False),
+        ('Total Revenue',    df['total_revenue'].sum(),                                df_full['total_revenue'].sum(), 'Rs', False),
+        ('Churn Rate',       df['churn'].mean(),                                       df_full['churn'].mean(),        'pct', True),
+        ('Conversion Rate',  df['has_purchased'].mean(),                               df_full['has_purchased'].mean(),'pct', False),
+        ('Avg LTV (buyers)', buyers['total_revenue'].mean() if len(buyers)>0 else 0,   bf['total_revenue'].mean(),     'Rs', False),
+        ('Avg AOV',          buyers['avg_order_value'].mean() if len(buyers)>0 else 0, bf['avg_order_value'].mean(),   'Rs', False),
     ]
+
     cols = st.columns(3)
-    for i, (name, val, base, fmt) in enumerate(metrics):
+    for i, (name, val, base_val, fmt, invert) in enumerate(metrics):
         with cols[i % 3]:
-            if fmt == 'pct':  st.metric(name, f'{val*100:.1f}%',  f'{(val-base)*100:+.2f}pp')
-            elif fmt == 'Rs': st.metric(name, f'Rs {val:,.0f}',   f'Rs {val-base:+,.0f}')
-            else:             st.metric(name, f'{val:,}',          f'{int(val-base):+,}')
+            if not filters_active:
+                # No filters applied — no delta shown
+                if fmt == 'pct':
+                    st.metric(name, f'{val*100:.1f}%')
+                elif fmt == 'Rs':
+                    st.metric(name, f'Rs {val:,.0f}')
+                else:
+                    st.metric(name, f'{val:,}')
+            else:
+                # Filters applied — pass raw numeric delta so Streamlit
+                # handles green/red arrows correctly based on sign
+                d_color = 'inverse' if invert else 'normal'
+                if fmt == 'pct':
+                    delta_num = round((val - base_val) * 100, 2)
+                    st.metric(name, f'{val*100:.1f}%',
+                              delta=delta_num,
+                              delta_color=d_color)
+                elif fmt == 'Rs':
+                    delta_num = round(val - base_val, 0)
+                    st.metric(name, f'Rs {val:,.0f}',
+                              delta=delta_num,
+                              delta_color=d_color)
+                else:
+                    delta_num = int(val - base_val)
+                    st.metric(name, f'{val:,}',
+                              delta=delta_num,
+                              delta_color=d_color)
+
     st.markdown('---')
     c1, c2 = st.columns(2)
     with c1:
