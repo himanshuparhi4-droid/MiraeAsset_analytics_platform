@@ -56,7 +56,7 @@ from raw data generation through predictive modelling, business simulation, and 
 | 17 | Pricing Strategy — AOV distribution, revenue concentration, optimisation scenarios | NB08 |
 | 18 | Business Simulation — 4 independent + 1 combined scenario | NB08 |
 
-### Stage 5 — Strategic Decision Intelligence 🔥
+### Stage 5 — Strategic Decision Intelligence 
 | Phase | Description | Notebook |
 |-------|-------------|----------|
 | 19 | KPI Tree — revenue decomposition, sensitivity analysis by lever | NB08 |
@@ -64,7 +64,7 @@ from raw data generation through predictive modelling, business simulation, and 
 | 21 | Decision Simulation — impact vs effort matrix, ranked action plan | NB08 |
 | 22 | Data Pipeline Architecture — system overview, data flow diagram | NB09 |
 
-### Stage 6 — Production & Deployment 🚀
+### Stage 6 — Production & Deployment 
 | Phase | Description | Notebook / File |
 |-------|-------------|-----------------|
 | 23 | Power BI Dashboard | Planned — export tables available in data/processed/ |
