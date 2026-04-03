@@ -1,5 +1,13 @@
 # Mirae Asset Digital Platform — User Analytics
 
+
+![Live Dashboard](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)
+
+(https://miraeassetanalytics.streamlit.app/)
+
+> 🔗 **[Launch Live Dashboard →](https://miraeassetanalytics.streamlit.app/)**
+
+A production-grade analytics system...
 A production-grade analytics system built on a synthetic fintech dataset.
 Covers the complete analytics lifecycle across 9 Jupyter notebooks and 27 phases —
 from raw data generation through predictive modelling, business simulation, and Streamlit deployment.
