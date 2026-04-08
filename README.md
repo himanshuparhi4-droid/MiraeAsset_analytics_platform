@@ -7,8 +7,7 @@
 
 > 🔗 **[Launch Live Dashboard →](https://miraeassetanalytics.streamlit.app/)**
 
-A production-grade analytics system...
-A production-grade analytics system built on a synthetic fintech dataset.
+An analytics system built on a synthetic fintech dataset.
 Covers the complete analytics lifecycle across 9 Jupyter notebooks and 27 phases —
 from raw data generation through predictive modelling, business simulation, and Streamlit deployment.
 
