@@ -74,7 +74,7 @@ Current metrics are generated from `data/processed/project_metrics.json` after r
 |-------|-------------|-----------------|
 | 23 | Power BI Dashboard | Single-file dashboard: `powerbi/Mirae_Asset_Analytics.pbix` |
 | 24 | Automation - `pipeline.py` rebuilds master data, segmentation, marketing summary, and project metrics | NB09 + `scripts/pipeline.py` |
-| 25 | Deployment - 4-tab Streamlit dashboard with dynamic metrics and segmentation tab | NB09 + `app/app.py` |
+| 25 | Deployment - 6-tab Streamlit dashboard with dynamic metrics, segmentation, and drilldown views | NB09 + `app/app.py` |
 | 26 | Documentation - README, requirements.txt, .gitignore | NB09 |
 | 27 | Video Walkthrough | Planned - Loom recording link to be added |
 
@@ -83,7 +83,7 @@ Current metrics are generated from `data/processed/project_metrics.json` after r
 ## Key Findings
 
 1. **Referral is the most efficient paid channel in the current baseline.** Referral has the lowest paid CAC per buyer at about Rs 207 and the highest paid ROAS at about 38.0x.
-2. **Revenue concentration is moderate.** The top 10% of all users generate 38.4% of revenue, while the top 10% of buyers generate 21.3%.
+2. **Revenue concentration is moderate.** The top 10% of all users generate about 38.1% of revenue, while the top 10% of buyers generate about 21.2%.
 3. **Churn remains predictable without leakage.** The tuned Gradient Boosting churn model reaches AUC 0.826 after excluding direct recency leakage, indirect recency proxies, and duplicate RFM monetary/frequency columns.
 4. **AOV improvement is the largest broad lever.** A 10% AOV lift implies about Rs 3.81M gross revenue upside on the current baseline.
 5. **The funnel is causal and has real top-of-funnel drop-off.** Notebook 01 now generates 12,500 visitors, 10,000 signups, 7,000 cart users, and 4,800 purchasers in chronological order.
