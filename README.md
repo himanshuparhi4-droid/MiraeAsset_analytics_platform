@@ -86,7 +86,7 @@ Current metrics are generated from `data/processed/project_metrics.json` after r
 2. **Revenue concentration is moderate.** The top 10% of all users generate about 38.1% of revenue, while the top 10% of buyers generate about 21.2%.
 3. **Churn remains predictable without leakage.** The tuned Gradient Boosting churn model reaches AUC 0.826 after excluding direct recency leakage, indirect recency proxies, and duplicate RFM monetary/frequency columns.
 4. **AOV improvement is the largest broad lever.** A 10% AOV lift implies about Rs 3.81M gross revenue upside on the current baseline.
-5. **The funnel is causal and has real top-of-funnel drop-off.** Notebook 01 now generates 12,500 visitors, 10,000 signups, 7,000 cart users, and 4,800 purchasers in chronological order.
+5. **The funnel is causal and has real top-of-funnel drop-off.** Notebook 01  generates 12,500 visitors, 10,000 signups, 7,000 cart users, and 4,800 purchasers in chronological order.
 6. **The production pipeline is complete.** One command rebuilds processed data, marketing metrics, out-of-fold churn risk scores, and model artifacts.
 
 ---
