@@ -77,7 +77,7 @@ st.markdown(
     .block-container {
         width: min(100%, 1520px);
         max-width: none;
-        padding: 1rem clamp(1rem, 1.8vw, 2rem) 2rem clamp(1rem, 1.8vw, 2rem);
+        padding: 1.15rem clamp(1rem, 1.8vw, 2rem) 2.25rem clamp(1rem, 1.8vw, 2rem);
         margin-left: auto;
         margin-right: auto;
     }
@@ -85,7 +85,7 @@ st.markdown(
         min-width: 0;
     }
     [data-testid="stHorizontalBlock"] {
-        gap: clamp(0.9rem, 1.2vw, 1.25rem);
+        gap: clamp(1rem, 1.35vw, 1.45rem);
         align-items: stretch;
     }
     [data-testid="stVerticalBlock"] {
@@ -94,6 +94,11 @@ st.markdown(
     section[data-testid="stSidebar"] {
         background: #090f1c;
         border-right: 1px solid #183a59;
+        min-width: 360px !important;
+        width: 360px !important;
+    }
+    section[data-testid="stSidebar"] > div:first-child {
+        padding: 1.35rem 1rem 1.5rem 1rem;
     }
     section[data-testid="stSidebar"] * {
         color: var(--text);
@@ -179,7 +184,7 @@ st.markdown(
         border: 1px solid #174a70;
         border-radius: 14px;
         background: #081f35;
-        padding: 0.35rem;
+        padding: 0.45rem 0.5rem 0.3rem 0.5rem;
         box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
     }
     div[data-testid="stPlotlyChart"] > div {
@@ -286,7 +291,16 @@ st.markdown(
         background-color: #0b2740;
         color: #ffffff;
         border: 1px solid #174a70;
-        max-width: 100%;
+        max-width: 145px;
+        min-height: 30px;
+        margin: 2px 4px 2px 0;
+        font-size: 0.78rem;
+    }
+    [data-testid="stSidebar"] .stMultiSelect [data-baseweb="tag"] span {
+        max-width: 105px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     [data-testid="stSidebar"] [data-baseweb="select"] {
         min-width: 0 !important;
@@ -295,6 +309,17 @@ st.markdown(
         background: #081f35 !important;
         border-color: #174a70 !important;
         box-shadow: none !important;
+        max-height: 112px;
+        overflow-y: auto;
+    }
+    [data-testid="stSidebar"] label p {
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        margin-bottom: 0.25rem;
+    }
+    [data-testid="stSidebar"] .stMetric {
+        overflow: hidden;
     }
     [data-testid="stSidebar"] [data-baseweb="select"] input,
     [data-testid="stSidebar"] [data-baseweb="select"] span {
@@ -387,24 +412,35 @@ def render_kpi_grid(metrics):
     st.markdown(f'<div class="kpi-grid">{"".join(cards)}</div>', unsafe_allow_html=True)
 
 
-def apply_common_layout(fig, height=360):
+def apply_common_layout(fig, height=360, show_legend=True):
+    top_margin = 108 if show_legend else 66
     fig.update_layout(
         height=height,
         autosize=True,
-        margin=dict(l=54, r=24, t=64, b=48),
+        margin=dict(l=64, r=32, t=top_margin, b=64),
         paper_bgcolor='#081f35',
         plot_bgcolor='#081f35',
         font=dict(family='Segoe UI, Arial', size=12, color='#eaf6ff'),
+        showlegend=show_legend,
+        legend_title_text='',
         legend=dict(
             orientation='h',
             yanchor='bottom',
-            y=1.02,
+            y=1.04,
             xanchor='left',
             x=0,
-            font=dict(color='#b7c4d6', size=11),
-            itemwidth=30,
+            font=dict(color='#b7c4d6', size=10),
+            itemwidth=34,
+            tracegroupgap=8,
         ),
-        title=dict(font=dict(color='#ffffff', size=16)),
+        title=dict(
+            x=0.01,
+            xanchor='left',
+            y=0.985,
+            yanchor='top',
+            font=dict(color='#ffffff', size=14),
+            pad=dict(t=10, b=18),
+        ),
         hoverlabel=dict(bgcolor='#0b2740', bordercolor='#23b7f2', font=dict(color='#ffffff')),
         uniformtext_minsize=9,
         uniformtext_mode='hide',
@@ -415,6 +451,7 @@ def apply_common_layout(fig, height=360):
     fig.update_yaxes(gridcolor='#183a59', zeroline=False, automargin=True)
     fig.update_xaxes(color='#b7c4d6', title_font=dict(color='#8ea9c5'), tickfont=dict(color='#b7c4d6'))
     fig.update_yaxes(color='#b7c4d6', title_font=dict(color='#8ea9c5'), tickfont=dict(color='#b7c4d6'))
+    fig.update_xaxes(tickangle=0)
     return fig
 
 
@@ -652,7 +689,7 @@ with tab_exec:
                 marker=dict(color=[COLOR_BLUE, COLOR_TEAL, COLOR_AMBER, COLOR_GREEN]),
             ))
             fig.update_layout(title='Visitor Funnel')
-            st.plotly_chart(apply_common_layout(fig, 360), use_container_width=True)
+            st.plotly_chart(apply_common_layout(fig, 360, show_legend=False), use_container_width=True)
     with c2:
         st.subheader('Current Baseline')
         callout_rows = [
@@ -686,7 +723,9 @@ with tab_exec:
             },
             title='Risk Tier Distribution',
         )
-        st.plotly_chart(apply_common_layout(fig, 330), use_container_width=True)
+        fig.update_xaxes(title='')
+        fig.update_yaxes(title='Users')
+        st.plotly_chart(apply_common_layout(fig, 330, show_legend=False), use_container_width=True)
     with c4:
         channel_rev = df.groupby('acquisition_channel', as_index=False).agg(
             revenue=('total_revenue', 'sum'),
@@ -702,8 +741,9 @@ with tab_exec:
             text=channel_rev['revenue'].map(lambda x: f'{x / 1_000_000:.1f}M'),
         )
         fig.update_traces(textposition='outside')
+        fig.update_xaxes(title='')
         fig.update_yaxes(tickprefix='Rs ')
-        st.plotly_chart(apply_common_layout(fig, 330), use_container_width=True)
+        st.plotly_chart(apply_common_layout(fig, 330, show_legend=False), use_container_width=True)
 
 with tab_acq:
     st.subheader('Acquisition & Paid Efficiency')
@@ -737,8 +777,9 @@ with tab_acq:
                 text=marketing_summary.sort_values('conversion_rate', ascending=False)['conversion_rate'].map(lambda x: f'{x * 100:.1f}%'),
             )
             fig.update_traces(textposition='outside')
+            fig.update_xaxes(title='')
             fig.update_yaxes(tickformat='.0%')
-            st.plotly_chart(apply_common_layout(fig, 390), use_container_width=True)
+            st.plotly_chart(apply_common_layout(fig, 390, show_legend=False), use_container_width=True)
 
         scorecard = marketing_summary.copy()
         scorecard['conversion_rate'] = (scorecard['conversion_rate'] * 100).round(1)
@@ -747,21 +788,28 @@ with tab_acq:
         scorecard['CAC_per_buyer'] = scorecard['CAC_per_buyer'].round(0).astype(int)
         scorecard['total_revenue'] = scorecard['total_revenue'].round(0).astype(int)
         scorecard['total_spend'] = scorecard['total_spend'].round(0).astype(int)
-        st.dataframe(
-            scorecard[[
-                'channel',
-                'users',
-                'buyers',
-                'conversion_rate',
-                'churn_rate',
-                'total_spend',
-                'CAC_per_buyer',
-                'ROAS',
-                'total_revenue',
-            ]],
-            use_container_width=True,
-            hide_index=True,
-        )
+        scorecard_display = scorecard[[
+            'channel',
+            'users',
+            'buyers',
+            'conversion_rate',
+            'churn_rate',
+            'total_spend',
+            'CAC_per_buyer',
+            'ROAS',
+            'total_revenue',
+        ]].rename(columns={
+            'channel': 'Channel',
+            'users': 'Users',
+            'buyers': 'Buyers',
+            'conversion_rate': 'Conversion %',
+            'churn_rate': 'Churn %',
+            'total_spend': 'Spend',
+            'CAC_per_buyer': 'CAC / Buyer',
+            'ROAS': 'ROAS',
+            'total_revenue': 'Revenue',
+        })
+        st.dataframe(scorecard_display, use_container_width=True, hide_index=True)
 
 with tab_rev:
     st.subheader('Revenue Performance')
@@ -772,8 +820,9 @@ with tab_rev:
             users=('user_id', 'count'),
         ).sort_values('signup_month')
         fig = px.line(monthly, x='signup_month', y='revenue', markers=True, title='Revenue by Signup Cohort')
+        fig.update_xaxes(title='Signup month')
         fig.update_yaxes(tickprefix='Rs ')
-        st.plotly_chart(apply_common_layout(fig, 360), use_container_width=True)
+        st.plotly_chart(apply_common_layout(fig, 360, show_legend=False), use_container_width=True)
     with c2:
         state_rev = df.groupby('state', as_index=False)['total_revenue'].sum().nlargest(10, 'total_revenue')
         fig = px.bar(
@@ -786,8 +835,9 @@ with tab_rev:
             title='Top 10 States by Revenue',
         )
         fig.update_xaxes(tickprefix='Rs ')
+        fig.update_yaxes(title='')
         fig.update_layout(coloraxis_showscale=False)
-        st.plotly_chart(apply_common_layout(fig, 360), use_container_width=True)
+        st.plotly_chart(apply_common_layout(fig, 360, show_legend=False), use_container_width=True)
 
     c3, c4 = st.columns(2)
     with c3:
@@ -806,9 +856,9 @@ with tab_rev:
                 title='Revenue Concentration',
             )
             fig.add_hline(y=80, line_dash='dash', line_color=COLOR_RED)
-            fig.update_xaxes(title='% of buyers ranked by revenue')
-            fig.update_yaxes(title='Cumulative revenue %')
-            st.plotly_chart(apply_common_layout(fig, 350), use_container_width=True)
+        fig.update_xaxes(title='% of buyers ranked by revenue')
+        fig.update_yaxes(title='Cumulative revenue %')
+        st.plotly_chart(apply_common_layout(fig, 350, show_legend=False), use_container_width=True)
 
 with tab_churn:
     st.subheader('Churn & Risk')
@@ -832,19 +882,21 @@ with tab_churn:
             title='Churn Rate by Channel',
             text=churn_channel.sort_values('churn_rate', ascending=False)['churn_rate'].map(lambda x: f'{x * 100:.1f}%'),
         )
+        fig.update_xaxes(title='')
         fig.update_yaxes(tickformat='.0%')
         fig.update_layout(coloraxis_showscale=False)
-        st.plotly_chart(apply_common_layout(fig, 360), use_container_width=True)
+        st.plotly_chart(apply_common_layout(fig, 360, show_legend=False), use_container_width=True)
     with c5:
         if 'churn_proba' in df.columns:
             proba_df = df[df['churn_proba'].notna()].copy()
+            proba_df['churn_status'] = np.where(proba_df['churn'].eq(1), 'Churned', 'Active')
             fig = px.histogram(
                 proba_df,
                 x='churn_proba',
-                color='churn',
+                color='churn_status',
                 nbins=40,
                 barmode='overlay',
-                color_discrete_map={0: COLOR_BLUE, 1: COLOR_RED},
+                color_discrete_map={'Active': COLOR_BLUE, 'Churned': COLOR_RED},
                 title='Out-of-Fold Churn Probability',
             )
             fig.update_xaxes(tickformat='.0%')
@@ -863,7 +915,15 @@ with tab_churn:
     risk_table['total_revenue'] = risk_table['total_revenue'].round(0).astype(int)
     risk_table['avg_sessions'] = risk_table['avg_sessions'].round(1)
     risk_table['avg_engagement'] = risk_table['avg_engagement'].round(3)
-    st.dataframe(risk_table, use_container_width=True, hide_index=True)
+    risk_display = risk_table.rename(columns={
+        'risk_tier': 'Risk Tier',
+        'users': 'Users',
+        'actual_churn_rate': 'Actual Churn %',
+        'total_revenue': 'Revenue',
+        'avg_sessions': 'Avg Sessions',
+        'avg_engagement': 'Avg Engagement',
+    })
+    st.dataframe(risk_display, use_container_width=True, hide_index=True)
 
 with tab_seg:
     st.subheader('Segmentation')
@@ -880,7 +940,9 @@ with tab_seg:
             color_discrete_sequence=PALETTE,
             title='RFM Segment Size',
         )
-        st.plotly_chart(apply_common_layout(fig, 380), use_container_width=True)
+        fig.update_xaxes(title='Users')
+        fig.update_yaxes(title='')
+        st.plotly_chart(apply_common_layout(fig, 380, show_legend=False), use_container_width=True)
     with c2:
         seg_rev = df.groupby('RFM_Segment', as_index=False).agg(avg_revenue=('total_revenue', 'mean'))
         seg_rev['RFM_Segment'] = pd.Categorical(seg_rev['RFM_Segment'], categories=RFM_ORDER, ordered=True)
@@ -895,15 +957,18 @@ with tab_seg:
             title='Average Revenue by Segment',
         )
         fig.update_xaxes(tickprefix='Rs ')
+        fig.update_yaxes(title='')
         fig.update_layout(coloraxis_showscale=False)
-        st.plotly_chart(apply_common_layout(fig, 380), use_container_width=True)
+        st.plotly_chart(apply_common_layout(fig, 380, show_legend=False), use_container_width=True)
 
     c3, c4 = st.columns(2)
     with c3:
         cluster_counts = df['cluster_label'].value_counts().reindex([c for c in CLUSTER_ORDER if c in df['cluster_label'].unique()]).dropna().reset_index()
         cluster_counts.columns = ['cluster', 'users']
         fig = px.bar(cluster_counts, x='cluster', y='users', color='cluster', color_discrete_sequence=PALETTE, title='Cluster Size')
-        st.plotly_chart(apply_common_layout(fig, 350), use_container_width=True)
+        fig.update_xaxes(title='')
+        fig.update_yaxes(title='Users')
+        st.plotly_chart(apply_common_layout(fig, 350, show_legend=False), use_container_width=True)
     with c4:
         cluster_revenue = df.groupby('cluster_label', as_index=False).agg(
             avg_revenue=('total_revenue', 'mean'),
@@ -936,7 +1001,15 @@ with tab_seg:
     seg_table['churn_rate'] = (seg_table['churn_rate'] * 100).round(1)
     seg_table['avg_revenue'] = seg_table['avg_revenue'].round(0).astype(int)
     seg_table['avg_sessions'] = seg_table['avg_sessions'].round(1)
-    st.dataframe(seg_table, use_container_width=True, hide_index=True)
+    seg_display = seg_table.rename(columns={
+        'RFM_Segment': 'RFM Segment',
+        'users': 'Users',
+        'conversion': 'Conversion %',
+        'churn_rate': 'Churn %',
+        'avg_revenue': 'Avg Revenue',
+        'avg_sessions': 'Avg Sessions',
+    })
+    st.dataframe(seg_display, use_container_width=True, hide_index=True)
 
 with tab_data:
     st.subheader('Filtered User Table')
@@ -957,9 +1030,35 @@ with tab_data:
         'churn_proba',
     ]
     cols_show = [c for c in cols_show if c in df.columns]
-    sort_col = st.selectbox('Sort by', ['total_revenue', 'churn_proba', 'total_sessions', 'engagement_score'], index=0)
+    sort_labels = {
+        'total_revenue': 'Total Revenue',
+        'churn_proba': 'Churn Probability',
+        'total_sessions': 'Total Sessions',
+        'engagement_score': 'Engagement Score',
+    }
+    sort_col = st.selectbox(
+        'Sort by',
+        list(sort_labels),
+        index=0,
+        format_func=lambda col: sort_labels[col],
+    )
     ascending = st.toggle('Ascending', value=False)
-    preview = df[cols_show].sort_values(sort_col, ascending=ascending).head(1000)
+    preview = df[cols_show].sort_values(sort_col, ascending=ascending).head(1000).rename(columns={
+        'user_id': 'User ID',
+        'acquisition_channel': 'Acquisition Channel',
+        'device': 'Device',
+        'gender': 'Gender',
+        'age': 'Age',
+        'risk_tier': 'Risk Tier',
+        'RFM_Segment': 'RFM Segment',
+        'cluster_label': 'Cluster',
+        'total_sessions': 'Total Sessions',
+        'total_revenue': 'Total Revenue',
+        'has_purchased': 'Purchased',
+        'churn': 'Churned',
+        'engagement_score': 'Engagement Score',
+        'churn_proba': 'Churn Probability',
+    })
     st.dataframe(preview, use_container_width=True, hide_index=True)
     st.download_button(
         'Download filtered CSV',
