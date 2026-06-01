@@ -23,6 +23,13 @@ COLOR_RED = '#FF4D6D'
 COLOR_PURPLE = '#9B5DE5'
 COLOR_GRAY = '#8EA9C5'
 PALETTE = [COLOR_BLUE, COLOR_TEAL, COLOR_GREEN, COLOR_AMBER, COLOR_PURPLE, COLOR_RED]
+PLOTLY_CONFIG = {
+    'displayModeBar': False,
+    'displaylogo': False,
+    'scrollZoom': False,
+    'doubleClick': 'reset',
+    'responsive': True,
+}
 
 RISK_ORDER = ['Low Risk', 'Medium Risk', 'High Risk', 'Critical Risk', 'Not Observable']
 RFM_ORDER = [
@@ -75,8 +82,8 @@ st.markdown(
         color: var(--text);
     }
     .block-container {
-        width: min(100%, 1520px);
-        max-width: none;
+        width: min(100%, 1320px);
+        max-width: 1320px;
         padding: 1.15rem clamp(1rem, 1.8vw, 2rem) 2.25rem clamp(1rem, 1.8vw, 2rem);
         margin-left: auto;
         margin-right: auto;
@@ -126,6 +133,10 @@ st.markdown(
     div[data-testid="stMetricValue"] {
         color: #ffffff;
         font-weight: 800;
+        font-size: 1.62rem;
+        line-height: 1.14;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
     div[data-testid="stMetricDelta"] {
         color: var(--cyan);
@@ -155,7 +166,7 @@ st.markdown(
     }
     .kpi-value {
         color: #ffffff;
-        font-size: clamp(1.55rem, 1.8vw, 2.25rem);
+        font-size: 1.58rem;
         font-weight: 900;
         line-height: 1.05;
         margin-top: 10px;
@@ -186,6 +197,7 @@ st.markdown(
         background: #081f35;
         padding: 0.45rem 0.5rem 0.3rem 0.5rem;
         box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+        contain: layout paint;
     }
     div[data-testid="stPlotlyChart"] > div {
         width: 100% !important;
@@ -194,13 +206,15 @@ st.markdown(
     div[data-testid="stPlotlyChart"] svg {
         max-width: 100%;
     }
-    .js-plotly-plot, .plot-container, .svg-container {
-        width: 100% !important;
-        max-width: 100% !important;
-    }
     @media (min-width: 1280px) {
         .kpi-grid {
             grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
+    }
+    @media (max-width: 760px) {
+        div[data-testid="stMetricValue"],
+        .kpi-value {
+            font-size: 1.42rem;
         }
     }
     @media (max-width: 1180px) {
@@ -417,6 +431,7 @@ def apply_common_layout(fig, height=360, show_legend=True):
     fig.update_layout(
         height=height,
         autosize=True,
+        dragmode=False,
         margin=dict(l=64, r=32, t=top_margin, b=64),
         paper_bgcolor='#081f35',
         plot_bgcolor='#081f35',
@@ -447,12 +462,20 @@ def apply_common_layout(fig, height=360, show_legend=True):
     )
     for trace_type in ['bar', 'scatter', 'histogram']:
         fig.update_traces(cliponaxis=False, selector=dict(type=trace_type))
-    fig.update_xaxes(showgrid=False, zeroline=False, automargin=True)
-    fig.update_yaxes(gridcolor='#183a59', zeroline=False, automargin=True)
+    fig.update_xaxes(showgrid=False, zeroline=False, automargin=True, fixedrange=True)
+    fig.update_yaxes(gridcolor='#183a59', zeroline=False, automargin=True, fixedrange=True)
     fig.update_xaxes(color='#b7c4d6', title_font=dict(color='#8ea9c5'), tickfont=dict(color='#b7c4d6'))
     fig.update_yaxes(color='#b7c4d6', title_font=dict(color='#8ea9c5'), tickfont=dict(color='#b7c4d6'))
     fig.update_xaxes(tickangle=0)
     return fig
+
+
+def render_chart(fig, height=360, show_legend=True):
+    st.plotly_chart(
+        apply_common_layout(fig, height, show_legend=show_legend),
+        use_container_width=True,
+        config=PLOTLY_CONFIG,
+    )
 
 
 @st.cache_data(ttl=600)
@@ -689,7 +712,7 @@ with tab_exec:
                 marker=dict(color=[COLOR_BLUE, COLOR_TEAL, COLOR_AMBER, COLOR_GREEN]),
             ))
             fig.update_layout(title='Visitor Funnel')
-            st.plotly_chart(apply_common_layout(fig, 360, show_legend=False), use_container_width=True)
+            render_chart(fig, 360, show_legend=False)
     with c2:
         st.subheader('Current Baseline')
         callout_rows = [
@@ -725,7 +748,7 @@ with tab_exec:
         )
         fig.update_xaxes(title='')
         fig.update_yaxes(title='Users')
-        st.plotly_chart(apply_common_layout(fig, 330, show_legend=False), use_container_width=True)
+        render_chart(fig, 330, show_legend=False)
     with c4:
         channel_rev = df.groupby('acquisition_channel', as_index=False).agg(
             revenue=('total_revenue', 'sum'),
@@ -743,7 +766,7 @@ with tab_exec:
         fig.update_traces(textposition='outside')
         fig.update_xaxes(title='')
         fig.update_yaxes(tickprefix='Rs ')
-        st.plotly_chart(apply_common_layout(fig, 330, show_legend=False), use_container_width=True)
+        render_chart(fig, 330, show_legend=False)
 
 with tab_acq:
     st.subheader('Acquisition & Paid Efficiency')
@@ -765,7 +788,7 @@ with tab_acq:
             )
             fig.update_xaxes(title='CAC per Buyer (Rs)')
             fig.update_yaxes(title='ROAS (x)')
-            st.plotly_chart(apply_common_layout(fig, 390), use_container_width=True)
+            render_chart(fig, 390)
         with c2:
             fig = px.bar(
                 marketing_summary.sort_values('conversion_rate', ascending=False),
@@ -779,7 +802,7 @@ with tab_acq:
             fig.update_traces(textposition='outside')
             fig.update_xaxes(title='')
             fig.update_yaxes(tickformat='.0%')
-            st.plotly_chart(apply_common_layout(fig, 390, show_legend=False), use_container_width=True)
+            render_chart(fig, 390, show_legend=False)
 
         scorecard = marketing_summary.copy()
         scorecard['conversion_rate'] = (scorecard['conversion_rate'] * 100).round(1)
@@ -822,7 +845,7 @@ with tab_rev:
         fig = px.line(monthly, x='signup_month', y='revenue', markers=True, title='Revenue by Signup Cohort')
         fig.update_xaxes(title='Signup month')
         fig.update_yaxes(tickprefix='Rs ')
-        st.plotly_chart(apply_common_layout(fig, 360, show_legend=False), use_container_width=True)
+        render_chart(fig, 360, show_legend=False)
     with c2:
         state_rev = df.groupby('state', as_index=False)['total_revenue'].sum().nlargest(10, 'total_revenue')
         fig = px.bar(
@@ -837,13 +860,13 @@ with tab_rev:
         fig.update_xaxes(tickprefix='Rs ')
         fig.update_yaxes(title='')
         fig.update_layout(coloraxis_showscale=False)
-        st.plotly_chart(apply_common_layout(fig, 360, show_legend=False), use_container_width=True)
+        render_chart(fig, 360, show_legend=False)
 
     c3, c4 = st.columns(2)
     with c3:
         device_rev = df.groupby('device', as_index=False)['total_revenue'].sum()
         fig = px.pie(device_rev, names='device', values='total_revenue', color_discrete_sequence=PALETTE, title='Revenue by Device')
-        st.plotly_chart(apply_common_layout(fig, 350), use_container_width=True)
+        render_chart(fig, 350)
     with c4:
         buyers_df = df[df['has_purchased'].eq(1)].sort_values('total_revenue', ascending=False).copy()
         if len(buyers_df):
@@ -858,7 +881,7 @@ with tab_rev:
             fig.add_hline(y=80, line_dash='dash', line_color=COLOR_RED)
         fig.update_xaxes(title='% of buyers ranked by revenue')
         fig.update_yaxes(title='Cumulative revenue %')
-        st.plotly_chart(apply_common_layout(fig, 350, show_legend=False), use_container_width=True)
+        render_chart(fig, 350, show_legend=False)
 
 with tab_churn:
     st.subheader('Churn & Risk')
@@ -885,7 +908,7 @@ with tab_churn:
         fig.update_xaxes(title='')
         fig.update_yaxes(tickformat='.0%')
         fig.update_layout(coloraxis_showscale=False)
-        st.plotly_chart(apply_common_layout(fig, 360, show_legend=False), use_container_width=True)
+        render_chart(fig, 360, show_legend=False)
     with c5:
         if 'churn_proba' in df.columns:
             proba_df = df[df['churn_proba'].notna()].copy()
@@ -900,7 +923,7 @@ with tab_churn:
                 title='Out-of-Fold Churn Probability',
             )
             fig.update_xaxes(tickformat='.0%')
-            st.plotly_chart(apply_common_layout(fig, 360), use_container_width=True)
+            render_chart(fig, 360)
 
     risk_table = df.groupby('risk_tier', as_index=False).agg(
         users=('user_id', 'count'),
@@ -942,7 +965,7 @@ with tab_seg:
         )
         fig.update_xaxes(title='Users')
         fig.update_yaxes(title='')
-        st.plotly_chart(apply_common_layout(fig, 380, show_legend=False), use_container_width=True)
+        render_chart(fig, 380, show_legend=False)
     with c2:
         seg_rev = df.groupby('RFM_Segment', as_index=False).agg(avg_revenue=('total_revenue', 'mean'))
         seg_rev['RFM_Segment'] = pd.Categorical(seg_rev['RFM_Segment'], categories=RFM_ORDER, ordered=True)
@@ -959,7 +982,7 @@ with tab_seg:
         fig.update_xaxes(tickprefix='Rs ')
         fig.update_yaxes(title='')
         fig.update_layout(coloraxis_showscale=False)
-        st.plotly_chart(apply_common_layout(fig, 380, show_legend=False), use_container_width=True)
+        render_chart(fig, 380, show_legend=False)
 
     c3, c4 = st.columns(2)
     with c3:
@@ -968,7 +991,7 @@ with tab_seg:
         fig = px.bar(cluster_counts, x='cluster', y='users', color='cluster', color_discrete_sequence=PALETTE, title='Cluster Size')
         fig.update_xaxes(title='')
         fig.update_yaxes(title='Users')
-        st.plotly_chart(apply_common_layout(fig, 350, show_legend=False), use_container_width=True)
+        render_chart(fig, 350, show_legend=False)
     with c4:
         cluster_revenue = df.groupby('cluster_label', as_index=False).agg(
             avg_revenue=('total_revenue', 'mean'),
@@ -986,7 +1009,7 @@ with tab_seg:
         )
         fig.update_xaxes(tickformat='.0%', title='Churn rate')
         fig.update_yaxes(tickprefix='Rs ', title='Avg revenue')
-        st.plotly_chart(apply_common_layout(fig, 350), use_container_width=True)
+        render_chart(fig, 350)
 
     seg_table = df.groupby('RFM_Segment', as_index=False).agg(
         users=('user_id', 'count'),
